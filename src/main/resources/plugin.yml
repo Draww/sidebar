@@ -1,0 +1,9 @@
+main: me.crune.sidebar.example.ExamplePlugin
+name: "${project.name}"
+version: "${project.version}"
+website: "${project.url}"
+author: "Crune"
+commands:
+  test-cooldown:
+    usage: "/<command>"
+    description: "test cooldown"
