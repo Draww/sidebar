@@ -1,8 +1,5 @@
 package me.crune.sidebar.scoreboard.service;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import me.crune.sidebar.api.scoreboard.provider.SidebarProvider;
 import me.crune.sidebar.api.service.SidebarService;
 import me.crune.sidebar.scoreboard.CommonSidebar;
@@ -12,8 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public final class CommonSidebarService implements SidebarService {
 
@@ -22,16 +18,12 @@ public final class CommonSidebarService implements SidebarService {
     private Plugin plugin;
     private SidebarProvider provider;
 
-    private CommonSidebarService() {
-        task = -1;
-    }
-
     public CommonSidebarService(Plugin plugin) {
         this(plugin, null);
     }
 
     public CommonSidebarService(Plugin plugin, SidebarProvider provider) {
-        this.boardMap = Maps.newHashMap();
+        this.boardMap = new HashMap<>();
         this.plugin = plugin;
         this.provider = provider == null ? new DefaultProvider() : provider;
 
@@ -47,23 +39,27 @@ public final class CommonSidebarService implements SidebarService {
     }
 
     @Override
-    public void addBoardCooldown(Player player, Cooldown cooldown) {
-        getImmutableBoardMap().get(player.getUniqueId()).addCooldown(cooldown);
+    public void addCooldown(Player player, Cooldown cooldown) {
+        boardMap.get(player.getUniqueId()).addCooldown(cooldown);
     }
 
     @Override
-    public void removeBoardCooldown(Player player, String name) {
-        getImmutableBoardMap().get(player.getUniqueId()).removeCooldown(name);
+    public void removeCooldown(Player player, String name) {
+        boardMap.get(player.getUniqueId()).removeCooldown(name);
     }
 
     @Override
-    public ImmutableSet<Cooldown> getImmutableCooldowns(Player player) {
-        return getImmutableBoardMap().get(player.getUniqueId()).getImmutableCooldowns();
+    public Set<Cooldown> getCooldowns(Player player) {
+        return boardMap.get(player.getUniqueId()).getCooldowns();
     }
 
     @Override
     public void setProvider(SidebarProvider provider) {
         this.provider = provider;
+    }
+
+    public Map<UUID, CommonSidebar> getBoardMap() {
+        return new HashMap<>(boardMap);
     }
 
     Plugin getPlugin() {
@@ -81,12 +77,8 @@ public final class CommonSidebarService implements SidebarService {
     void stopProvider(UUID uuid) {
         CommonSidebar commonSidebar = boardMap.get(uuid);
         boardMap.remove(uuid);
-        commonSidebar.getImmutableCooldowns().forEach(boardCooldown -> {
-            commonSidebar.removeCooldown(boardCooldown.getName());
+        commonSidebar.getCooldowns().forEach(cooldown -> {
+            commonSidebar.removeCooldown(cooldown.getName());
         });
-    }
-
-    ImmutableMap<UUID, CommonSidebar> getImmutableBoardMap() {
-        return ImmutableMap.copyOf(boardMap);
     }
 }

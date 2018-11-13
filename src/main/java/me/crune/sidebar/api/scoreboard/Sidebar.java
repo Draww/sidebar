@@ -1,9 +1,9 @@
 package me.crune.sidebar.api.scoreboard;
 
-import com.google.common.collect.ImmutableSet;
 import me.crune.sidebar.scoreboard.cooldown.Cooldown;
 
 import java.util.List;
+import java.util.Set;
 
 public interface Sidebar {
 
@@ -13,7 +13,7 @@ public interface Sidebar {
 
     void addCooldown(Cooldown cooldown);
 
-    ImmutableSet<Cooldown> getImmutableCooldowns();
+    Set<Cooldown> getCooldowns();
 
     void hide();
 

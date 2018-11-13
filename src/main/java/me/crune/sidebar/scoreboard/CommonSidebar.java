@@ -1,8 +1,5 @@
 package me.crune.sidebar.scoreboard;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import me.crune.sidebar.api.scoreboard.Sidebar;
 import me.crune.sidebar.scoreboard.cooldown.Cooldown;
 import org.bukkit.Bukkit;
@@ -26,13 +23,13 @@ public class CommonSidebar implements Sidebar {
 
     public CommonSidebar(Player player) {
         this.holder = player.getUniqueId();
-        this.cooldowns = Sets.newHashSet();
+        this.cooldowns = new HashSet<>();
 
         setup();
     }
 
     private synchronized void setup() {
-        this.entryMap = Maps.newHashMap();
+        this.entryMap = new HashMap<>();
 
         Player player = getHolder();
 
@@ -53,7 +50,7 @@ public class CommonSidebar implements Sidebar {
             return null;
         }
 
-        Stream<Cooldown> stream = getImmutableCooldowns().stream();
+        Stream<Cooldown> stream = getCooldowns().stream();
         return stream.filter(cooldown -> cooldown.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
@@ -73,8 +70,8 @@ public class CommonSidebar implements Sidebar {
     }
 
     @Override
-    public ImmutableSet<Cooldown> getImmutableCooldowns() {
-        return ImmutableSet.copyOf(cooldowns);
+    public Set<Cooldown> getCooldowns() {
+        return new HashSet<>(cooldowns);
     }
 
     @Override

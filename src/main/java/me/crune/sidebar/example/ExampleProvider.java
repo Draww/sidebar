@@ -1,12 +1,12 @@
 package me.crune.sidebar.example;
 
-import com.google.common.collect.Lists;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import me.crune.sidebar.api.provider.Provider;
 import me.crune.sidebar.api.scoreboard.provider.SidebarProvider;
 import me.crune.sidebar.api.service.SidebarService;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExampleProvider implements SidebarProvider {
@@ -25,14 +25,14 @@ public class ExampleProvider implements SidebarProvider {
     @Override
     public Provider<Player, List<String>> getLines() {
         return player -> {
-            List<String> toReturn = Lists.newArrayList();
+            List<String> toReturn = new ArrayList<>();
 
             toReturn.add("&7&m-------------------------------------");
             toReturn.add("&6Online Players&7: &f" + Bukkit.getOnlinePlayers().size());
 
-            service.getImmutableCooldowns(player).forEach(boardCooldown -> {
+            service.getCooldowns(player).forEach(boardCooldown -> {
                 if (boardCooldown.hasEnded()) {
-                    service.removeBoardCooldown(player, boardCooldown.getName());
+                    service.removeCooldown(player, boardCooldown.getName());
                     return;
                 }
 
@@ -40,7 +40,7 @@ public class ExampleProvider implements SidebarProvider {
             });
 
             toReturn.add("");
-            toReturn.add("&6www.cleo.rip");
+            toReturn.add("&6Crune is awesome!");
             toReturn.add("&7&m-------------------------------------");
             return toReturn;
         };

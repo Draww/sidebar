@@ -1,19 +1,20 @@
 package me.crune.sidebar.api.service;
 
-import com.google.common.collect.ImmutableSet;
 import me.crune.sidebar.api.scoreboard.provider.SidebarProvider;
-import org.bukkit.entity.Player;
 import me.crune.sidebar.scoreboard.cooldown.Cooldown;
+import org.bukkit.entity.Player;
+
+import java.util.Set;
 
 public interface SidebarService {
 
     void disable();
 
-    void addBoardCooldown(Player player, Cooldown cooldown);
+    void addCooldown(Player player, Cooldown cooldown);
 
-    void removeBoardCooldown(Player player, String name);
+    void removeCooldown(Player player, String name);
 
-    ImmutableSet<Cooldown> getImmutableCooldowns(Player player);
+    Set<Cooldown> getCooldowns(Player player);
 
     void setProvider(SidebarProvider provider);
 

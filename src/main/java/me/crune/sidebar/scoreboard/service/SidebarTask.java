@@ -16,7 +16,7 @@ public class SidebarTask implements Runnable {
 
     @Override
     public void run() {
-        service.getImmutableBoardMap().forEach((uuid, sidebar) -> {
+        service.getBoardMap().forEach((uuid, sidebar) -> {
             if (isOnline(uuid)) {
                 Player player = Bukkit.getPlayer(uuid);
 

@@ -40,7 +40,7 @@ public class ExamplePlugin extends JavaPlugin {
 
         try {
             Cooldown cooldown = new Cooldown("test", "&aTest&7: &f", args[0]);
-            this.service.addBoardCooldown((Player) sender, cooldown);
+            this.service.addCooldown((Player) sender, cooldown);
         } catch (Exception e) {
             sender.sendMessage(ChatColor.RED + "Invalid Date! Example: \"/test-cooldown 10minute,5second\"");
         }
