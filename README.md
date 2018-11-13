@@ -2,11 +2,9 @@
 
 Introduction
 ---
-> Sidebar is an easy-to-use scoreboard API supporting up to 72 characters per line.
+> Sidebar is an easy-to-use scoreboard API supporting up to 32 characters per line.
 
 As a lightweight api, it should support almost all versions above 1.7.x on [Spigot](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/spigot/browse).
-
-**1.7.x Spigot will only support a maximum of 48 characters.**
 
 If you find any bugs, feel free to open an [Issue](https://github.com/crunesmh/sidebar/issues) or a [Pull Request](https://github.com/crunesmh/sidebar/pulls)
 
@@ -68,13 +66,13 @@ public class ExampleProvider implements SidebarProvider {
         return player -> {
             List<String> toReturn = Lists.newArrayList();
 
-            toReturn.add("&7&m-------------------------------------");
+            toReturn.add("&7&m----------------------------");
             toReturn.add("&6&lOnline Players&7: &f" + Bukkit.getOnlinePlayers().size());
             toReturn.add(""); // this is an empty line
-            toReturn.add("Supports up to 72 characters per line!");
+            toReturn.add("Supports up to 32 characters!");
             toReturn.add("");
-            toReturn.add("&6www.mcsoup.net");
-            toReturn.add("&7&m-------------------------------------");
+            toReturn.add("&6Crune is awesome!");
+            toReturn.add("&7&m----------------------------");
             return toReturn;
         };
     }

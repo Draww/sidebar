@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 public class CommonSidebar implements Sidebar {
 
     private UUID holder;
-    private Map<Integer, String> entryMap;
     private boolean shown;
     private Set<Cooldown> cooldowns;
 
@@ -29,17 +28,21 @@ public class CommonSidebar implements Sidebar {
     }
 
     private synchronized void setup() {
-        this.entryMap = new HashMap<>();
-
         Player player = getHolder();
 
         if (player.getScoreboard() == Bukkit.getScoreboardManager().getMainScoreboard()) {
             player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         }
 
-        if (player.getScoreboard().getObjective("cleo") == null) {
-            player.getScoreboard().registerNewObjective("cleo", "dummy").setDisplayName("cleo");
+        if (player.getScoreboard().getObjective("sidebar") == null) {
+            player.getScoreboard().registerNewObjective("sidebar", "dummy").setDisplayName("sidebar");
         }
+
+        IntStream.range(0, 16).forEach(i -> {
+            if (player.getScoreboard().getTeam("\u0000" + i) == null) {
+                player.getScoreboard().registerNewTeam("\u0000" + i);
+            }
+        });
 
         show();
     }
@@ -84,7 +87,7 @@ public class CommonSidebar implements Sidebar {
     @Override
     public void show() {
         Scoreboard scoreboard = getHolder().getScoreboard();
-        Objective objective = scoreboard.getObjective("cleo");
+        Objective objective = scoreboard.getObjective("sidebar");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         shown = true;
     }
@@ -98,7 +101,7 @@ public class CommonSidebar implements Sidebar {
     public void updateTitle(String title) {
         title = title.length() > 32 ? title.substring(0, 32) : title;
         Scoreboard scoreboard = getHolder().getScoreboard();
-        Objective objective = scoreboard.getObjective("cleo");
+        Objective objective = scoreboard.getObjective("sidebar");
 
         objective.setDisplayName(color(title));
     }
@@ -113,80 +116,57 @@ public class CommonSidebar implements Sidebar {
 
         IntStream.range(0, 16).forEach(i -> {
             if (entries.size() < i + 1) {
-                removeLine(i + 1, "");
+                removeLine(i + 1);
             } else {
-                updateLine(color(entries.get(i)), i + 1);
+                updateLine(entries.get(i), i + 1);
             }
         });
     }
 
-    private void removeLine(int line, String check) {
+    private void removeLine(int line) {
         Scoreboard scoreboard = getHolder().getScoreboard();
-        String oldEntry = entryMap.get(line);
-
-        if (oldEntry != null && !oldEntry.equals(check)) {
-            scoreboard.resetScores(oldEntry);
-        }
+        scoreboard.resetScores(ChatColor.values()[line].toString());
     }
 
     private void updateLine(String string, int line) {
         Scoreboard scoreboard = getHolder().getScoreboard();
-        Objective objective = scoreboard.getObjective("cleo");
+        Objective objective = scoreboard.getObjective("sidebar");
+
         String entry = createEntry(string, line);
+        Team team = scoreboard.getTeam("\u0000" + line);
+        team.addEntry(entry);
 
-        removeLine(line, entry);
-
-        entryMap.put(line, entry);
         objective.getScore(entry).setScore(line);
     }
 
     private String createEntry(String string, int line) {
         Scoreboard scoreboard = getHolder().getScoreboard();
 
-        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-
-        boolean old = version.contains("v1_7");
-
-        String prefix = string;
-        String entry = ChatColor.values()[line].toString();
-        String suffix = "";
-
-        if (string.length() > 15) {
-            prefix = string.substring(0, 16);
-            suffix = string.substring(16);
-
-            entry += ChatColor.getLastColors(prefix);
-
-            //thanks https://github.com/Notifyz
-            if (prefix.endsWith("\u00a7")) {
-                prefix = prefix.substring(0, 15);
-                entry += "\u00a7";
-            }
-
-            if (string.length() > 32) {
-                int colorLength = entry.length();
-                entry += string.substring(16);
-                suffix += entry.length() > (old ? 16 : 40) - colorLength ? entry.substring((old ? 16 : 40) - colorLength) : "";
-                entry = entry.length() > (old ? 16 : 40) - colorLength ? entry.substring(0, (old ? 16 : 40) - colorLength) : entry;
-
-                if (entry.endsWith("\u00a7")) {
-                    entry = entry.substring(0, entry.length() - 1);
-                    suffix = "\u00a7" + suffix;
-                }
-
-                suffix = suffix.length() > 15 ? suffix.substring(0, 16) : suffix;
-            }
-        }
-
+        String[] prefixSuffix = getPrefixSuffix(string);
         Team team = scoreboard.getTeam("\u0000" + line);
-        if (team == null) {
-            team = scoreboard.registerNewTeam("\u0000" + line);
-        }
-        team.addPlayer(new FakePlayer(entry));
-        team.setPrefix(prefix);
-        team.setSuffix(suffix);
+        team.setPrefix(prefixSuffix[0]);
+        team.setSuffix(prefixSuffix[1]);
 
-        return entry;
+        return ChatColor.values()[line].toString();
+    }
+
+    private String[] getPrefixSuffix(String s) {
+        s = color(s);
+
+        String prefix = getPrefix(s);
+        String suffix = getPrefix(ChatColor.getLastColors(prefix) + getSuffix(s));
+        return new String[]{prefix, suffix};
+    }
+
+    private String getPrefix(String s) {
+        return s.length() > 16 ? s.substring(0, 16) : s;
+    }
+
+    private String getSuffix(String s) {
+        if (s.length() > 32) {
+            s = s.substring(0, 32);
+        }
+        return s.length() > 16 ? s.substring(16) : "";
     }
 
     private String color(String s) {
